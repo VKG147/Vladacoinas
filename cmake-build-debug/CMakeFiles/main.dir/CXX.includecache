@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/main.cpp
+iostream
+-
+vladahasher.h
+C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vladahasher.h
+
+C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vladahasher.cpp
+vladahasher.h
+C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vladahasher.h
+iostream
+-
+fstream
+-
+
+C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vladahasher.h
+string
+-
+sstream
+-
+deque
+-
+bitset
+-
+cmath
+-
+limits
+-
+iomanip
+-
+
