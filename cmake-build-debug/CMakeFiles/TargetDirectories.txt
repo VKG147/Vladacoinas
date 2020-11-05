@@ -1,0 +1,3 @@
+C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/cmake-build-debug/CMakeFiles/main.dir
+C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/cmake-build-debug/CMakeFiles/rebuild_cache.dir
