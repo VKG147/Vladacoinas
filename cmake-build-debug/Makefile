@@ -149,33 +149,6 @@ main.cpp.s:
 	$(MAKE) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/main.cpp.s
 .PHONY : main.cpp.s
 
-vladahasher.obj: vladahasher.cpp.obj
-
-.PHONY : vladahasher.obj
-
-# target to build an object file
-vladahasher.cpp.obj:
-	$(MAKE) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/vladahasher.cpp.obj
-.PHONY : vladahasher.cpp.obj
-
-vladahasher.i: vladahasher.cpp.i
-
-.PHONY : vladahasher.i
-
-# target to preprocess a source file
-vladahasher.cpp.i:
-	$(MAKE) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/vladahasher.cpp.i
-.PHONY : vladahasher.cpp.i
-
-vladahasher.s: vladahasher.cpp.s
-
-.PHONY : vladahasher.s
-
-# target to generate assembly for a file
-vladahasher.cpp.s:
-	$(MAKE) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/vladahasher.cpp.s
-.PHONY : vladahasher.cpp.s
-
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -188,9 +161,6 @@ help:
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
-	@echo ... vladahasher.obj
-	@echo ... vladahasher.i
-	@echo ... vladahasher.s
 .PHONY : help
 
 

@@ -9,18 +9,36 @@
 C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/main.cpp
 iostream
 -
-vladahasher.h
-C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vladahasher.h
+vcoin.h
+C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vcoin.h
 
-C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vladahasher.cpp
-vladahasher.h
-C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vladahasher.h
+C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vcoin.h
 iostream
+-
+map
+-
+vector
+-
+string
+-
+random
+-
+iomanip
+-
+sstream
+-
+algorithm
 -
 fstream
 -
+sstream
+-
+deque
+-
+vhasher.h
+C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vhasher.h
 
-C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vladahasher.h
+C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vhasher.h
 string
 -
 sstream

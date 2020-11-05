@@ -83,10 +83,10 @@
 		<Unit filename="C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/main.cpp">
 			<Option target="main"/>
 		</Unit>
-		<Unit filename="C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vladahasher.cpp">
+		<Unit filename="C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vcoin.h">
 			<Option target="main"/>
 		</Unit>
-		<Unit filename="C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vladahasher.h">
+		<Unit filename="C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vhasher.h">
 			<Option target="main"/>
 		</Unit>
 		<Unit filename="C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/CMakeLists.txt">
