@@ -32,7 +32,7 @@ namespace VCoin
         std::string id;
         std::string sender;
         std::string receiver;
-        uint64_t sum;
+        double sum;
         time_t timestamp;
 
         std::string toHex() {
@@ -93,12 +93,20 @@ namespace VCoin
         return merkleTree[0];
     }
 
-    void transferTransactionsToBlock(VTransactions& transactions, VBlock& block) {
+    void transferTransactionsToBlock(VUsers& users, VTransactions& transactions, VBlock& block) {
         std::default_random_engine generator;
+
+        VUsers tmpUsers(users);
         while (block.transactions.size() < kTransactionsPerBlock && !transactions.empty()) {
             std::uniform_int_distribution<int> transDist(0, transactions.size()-1);
             uint32_t randIndex = transDist(generator);
-            block.transactions.push_back(transactions[randIndex]);
+
+            if (tmpUsers[transactions[randIndex].sender].balance >= transactions[randIndex].sum) {
+                block.transactions.push_back(transactions[randIndex]);
+                tmpUsers[transactions[randIndex].sender].balance -= transactions[randIndex].sum;
+                tmpUsers[transactions[randIndex].receiver].balance += transactions[randIndex].sum;
+            }
+
             transactions.erase(transactions.begin() + randIndex);
         }
     }

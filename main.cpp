@@ -10,18 +10,18 @@ int main(int argc, char** argv) {
     VUsers users;
     VTransactions transactions;
 
-    //users = VCoin::IO::getUsersFromFile(USERS_DATA_PATH);
-    //transactions = IO::getTransactionsFromFile(TRANSACTIONS_DATA_PATH);
+    users = VCoin::IO::getUsersFromFile(USERS_DATA_PATH);
+    transactions = IO::getTransactionsFromFile(TRANSACTIONS_DATA_PATH);
 
-    IO::genRandUsers(users, 1000, 100, 1000000);
-    IO::writeUsersToFile(USERS_DATA_PATH, users);
-
-    IO::genRandTransactions(transactions, users, 10000, 1, 10000, 3600*7);
-    IO::writeTransactionsToFile(TRANSACTIONS_DATA_PATH, transactions);
+//    IO::genRandUsers(users, 1000, 100, 1000000);
+//    IO::writeUsersToFile(USERS_DATA_PATH, users);
+//
+//    IO::genRandTransactions(transactions, users, 1000, 10000, 10000, 3600*7);
+//    IO::writeTransactionsToFile(TRANSACTIONS_DATA_PATH, transactions);
 
     VBlock genesisBlock;
     genesisBlock.prevBlock = "";
-    genesisBlock.diffTarget = 4;
+    genesisBlock.diffTarget = 1;
 
     Miner miner;
     miner.mine(genesisBlock);
@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 
     while (!transactions.empty()) {
         VBlock block;
-        transferTransactionsToBlock(transactions, block);
+        transferTransactionsToBlock(users, transactions, block);
         block.merkleRootHash = getMerkleRoot(block.transactions);
 
         Miner miner;
@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 
         if (Miner::hashMeetsTarget(VHasher::getHash(block.toHex()), block.diffTarget)) {
             chain.insert(block);
-            updateUsersBalance(users, transactions);
+            updateUsersBalance(users, block.transactions);
             IO::writeUsersToFile(USERS_DATA_PATH, users);
             IO::writeTransactionsToFile(TRANSACTIONS_DATA_PATH, transactions);
         }
