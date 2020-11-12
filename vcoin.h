@@ -20,7 +20,7 @@ namespace VCoin
 #define VTransactions std::deque<VTransaction>
 
     const uint32_t kTransactionsPerBlock = 100;
-    const uint8_t kCurrentDifficulty = 2;
+    const uint8_t kCurrentDifficulty = 3;
 
     struct VUser {
         std::string key;
@@ -62,6 +62,17 @@ namespace VCoin
 
             return blockHexStream.str();
         }
+
+        void printHeader()
+        {
+            std::cout << "Block hash: " << VHasher::getHash(toHex()) << "\n";
+            std::cout << "Previous block hash: " << prevBlock << "\n";
+            std::cout << "Timestamp (unix time): " << timeStamp << "\n";
+            std::cout << "Version: " << version << "\n";
+            std::cout << "Merkle root hash: " << merkleRootHash << "\n";
+            std::cout << "Nonce: " << nonce << "\n";
+            std::cout << "Difficulty target: " << static_cast<int>(diffTarget) << "\n";
+        }
     };
 
     bool compareTransactions(const VTransaction& a, const VTransaction& b) {
@@ -69,6 +80,7 @@ namespace VCoin
     }
 
     std::string getMerkleRoot(const VTransactions& transactions) {
+        if (transactions.empty()) return VHasher::getHash("");
         VTransactions transSorted(transactions);
         std::sort(transSorted.begin(), transSorted.end(), compareTransactions);
         std::deque<std::string> merkleTree;
@@ -127,33 +139,6 @@ namespace VCoin
         }
     }
 
-    class Miner
-    {
-    public:
-        static bool hashMeetsTarget(std::string hash, char target) {
-            for (char i = 0; i < target; ++i) {
-                if (hash[(int)i] != '0') return false;
-            }
-            return true;
-        }
-
-        static void mine(VBlock& block, uint64_t seed = 0) {
-            block.nonce = seed;
-            do
-            {
-                block.timeStamp = std::time(nullptr);
-                block.nonce++;
-
-                if (block.nonce % 100 == 0) {
-                    std::cout << block.nonce << std::endl;
-                }
-            }
-            while (!hashMeetsTarget(VHasher::getHash(block.toHex()), block.diffTarget));
-
-            std::cout << VHasher::getHash(block.toHex()) << std::endl;
-        }
-    };
-
     class BlockChain
     {
     private:
@@ -190,16 +175,42 @@ namespace VCoin
             return blockChain[hash];
         }
 
-        void insert(VBlock block) {
+        int insert(VBlock block) {
             std::string blockHash = VHasher::getHash(block.toHex());
-            if (!hashMeetsTarget(blockHash, kCurrentDifficulty)) return;
-            block.prevBlock = this->chainHead;
+            if (!hashMeetsTarget(blockHash, kCurrentDifficulty)) return 0;
+            if (block.prevBlock != this->chainHead) return 0;
             blockChain[blockHash] = block;
             this->chainHead = blockHash;
             _size++;
-            std::cout << "Size: " << _size << std::endl;
+            return 1;
         }
     };
+
+    class Miner
+    {
+    public:
+        static bool hashMeetsTarget(std::string hash, char target) {
+            for (char i = 0; i < target; ++i) {
+                if (hash[(int)i] != '0') return false;
+            }
+            return true;
+        }
+
+        static void mine(VBlock& block, BlockChain* chain = nullptr, uint64_t seed = 0) {
+            block.nonce = seed;
+            block.merkleRootHash = getMerkleRoot(block.transactions);
+            if (chain != nullptr) block.prevBlock = chain->head();
+            else block.prevBlock = VHasher::getHash("");
+            block.diffTarget = kCurrentDifficulty;
+            do
+            {
+                block.timeStamp = std::time(nullptr);
+                block.nonce++;
+            }
+            while (!hashMeetsTarget(VHasher::getHash(block.toHex()), kCurrentDifficulty) && (chain == nullptr || block.prevBlock == chain->head()));
+        }
+    };
+
 }
 
 namespace VCoin { namespace IO
