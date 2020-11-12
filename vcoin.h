@@ -111,6 +111,15 @@ namespace VCoin
         }
     }
 
+    void validateTransactions(VTransactions& transactions) {
+        for (int i = 0; i < transactions.size(); ++i) {
+            if (transactions[i].id != VHasher::getHash(transactions[i].toHex())) {
+                std::cout << "Invalid transaction found!\n";
+                transactions.erase(transactions.begin() + i);
+            }
+        }
+    }
+
     void updateUsersBalance(VUsers& users, const VTransactions& transactions) {
         for (const auto & transaction : transactions) {
             users[transaction.sender].balance -= transaction.sum;

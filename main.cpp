@@ -21,13 +21,13 @@ int main(int argc, char** argv) {
 
     VBlock genesisBlock;
     genesisBlock.prevBlock = "";
-    genesisBlock.diffTarget = 1;
+    genesisBlock.diffTarget = 2;
 
     Miner miner;
     miner.mine(genesisBlock);
 
     BlockChain chain = BlockChain(genesisBlock);
-
+    validateTransactions(transactions);
     while (!transactions.empty()) {
         VBlock block;
         transferTransactionsToBlock(users, transactions, block);
