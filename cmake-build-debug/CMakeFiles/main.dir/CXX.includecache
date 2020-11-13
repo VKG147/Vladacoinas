@@ -11,6 +11,12 @@ iostream
 -
 vcoin.h
 C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vcoin.h
+omp.h
+-
+chrono
+-
+algorithm
+-
 
 C:/Users/vlada/Documents/Git/VU ISI/Vladacoinas/vcoin.h
 iostream
