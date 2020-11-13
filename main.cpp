@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
 
     IO::genRandUsers(users, 1000, 100, 1000000);
     IO::writeUsersToFile(USERS_DATA_PATH, users);
-    IO::genRandTransactions(transactions, users, 10000, 1, 10000, 3600*7);
+    IO::genRandTransactions(transactions, users, 1000, 1, 10000, 3600*7);
     IO::writeTransactionsToFile(TRANSACTIONS_DATA_PATH, transactions);
 
     VBlock genesisBlock;
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
     validateTransactions(transactions);
 
-    const std::string miners[5] = { "1A", "1B", "1C", "1D", "1E" };
+    const std::string miners[5] = { "A", "B", "C", "D", "E" };
     double totalMineTime = 0;
     while (!transactions.empty()) {
         int winnerIndex = 0;
@@ -39,8 +39,8 @@ int main(int argc, char** argv) {
             VBlock block;
             transferTransactionsToBlock(pUsers, pTransactions, block);
 
-            std::cout << miners[omp_get_thread_num()] + " mining..\n";
-            Miner::mine(block, &chain, omp_get_thread_num() * 1000);
+            std::cout << std::to_string(chain.size()) + miners[omp_get_thread_num()] + " mining..\n";
+            Miner::mine(block, &chain, omp_get_thread_num() * 10000);
             if (chain.insert(block)) {
                 end = std::chrono::steady_clock::now();
                 updateUsersBalance(users, block.transactions);
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
         }
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
         totalMineTime += elapsed.count();
-        std::cout << miners[winnerIndex] << " has finished mining in " << 1.0*elapsed.count()/1000 << "s!\n";
+        std::cout << chain.size() << miners[winnerIndex] << " has finished mining in " << 1.0*elapsed.count()/1000 << "s!\n";
         std::cout << "========MINED BLOCK========\n";
         chain.get(chain.head()).printHeader();
         std::cout << "===========================\n";

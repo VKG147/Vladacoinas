@@ -20,7 +20,7 @@ namespace VCoin
 #define VTransactions std::deque<VTransaction>
 
     const uint32_t kTransactionsPerBlock = 100;
-    const uint8_t kCurrentDifficulty = 3;
+    const uint8_t kCurrentDifficulty = 4;
 
     struct VUser {
         std::string key;
