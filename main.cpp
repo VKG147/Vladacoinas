@@ -12,9 +12,12 @@ int main(int argc, char** argv) {
     VUsers users;
     VTransactions transactions;
 
+//    users = IO::getUsersFromFile(USERS_DATA_PATH);
+//    transactions = IO::getTransactionsFromFile(TRANSACTIONS_DATA_PATH);
+
     IO::genRandUsers(users, 1000, 100, 1000000);
     IO::writeUsersToFile(USERS_DATA_PATH, users);
-    IO::genRandTransactions(transactions, users, 1000, 1, 10000, 3600*7);
+    IO::genRandTransactions(transactions, users, 10000, 1, 10000, 3600*7);
     IO::writeTransactionsToFile(TRANSACTIONS_DATA_PATH, transactions);
 
     VBlock genesisBlock;
@@ -22,8 +25,6 @@ int main(int argc, char** argv) {
     Miner::mine(genesisBlock);
     BlockChain chain = BlockChain(genesisBlock);
     std::cout << "Genesis block hash: " << VHasher::getHash(genesisBlock.toHex()) << "\n\n";
-
-    validateTransactions(transactions);
 
     const std::string miners[5] = { "A", "B", "C", "D", "E" };
     double totalMineTime = 0;
@@ -37,6 +38,7 @@ int main(int argc, char** argv) {
             VTransactions pTransactions(transactions);
 
             VBlock block;
+            validateTransactions(pTransactions);
             transferTransactionsToBlock(pUsers, pTransactions, block);
 
             std::cout << std::to_string(chain.size()) + miners[omp_get_thread_num()] + " mining..\n";
@@ -51,7 +53,7 @@ int main(int argc, char** argv) {
         }
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
         totalMineTime += elapsed.count();
-        std::cout << chain.size() << miners[winnerIndex] << " has finished mining in " << 1.0*elapsed.count()/1000 << "s!\n";
+        std::cout << chain.size()-1 << miners[winnerIndex] << " has finished mining in " << 1.0*elapsed.count()/1000 << "s!\n";
         std::cout << "========MINED BLOCK========\n";
         chain.get(chain.head()).printHeader();
         std::cout << "===========================\n";

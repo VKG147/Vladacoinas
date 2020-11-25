@@ -12,6 +12,7 @@
 #include <sstream>
 #include <deque>
 #include "vhasher.h"
+#include <bitcoin/bitcoin.hpp>
 
 
 namespace VCoin
@@ -20,7 +21,7 @@ namespace VCoin
 #define VTransactions std::deque<VTransaction>
 
     const uint32_t kTransactionsPerBlock = 100;
-    const uint8_t kCurrentDifficulty = 4;
+    const uint8_t kCurrentDifficulty = 3;
 
     struct VUser {
         std::string key;
@@ -79,6 +80,51 @@ namespace VCoin
         return a.id > b.id;
     }
 
+    // Merkle Root Hash
+    bc::hash_digest create_merkle(bc::hash_list& merkle)
+    {
+        // Stop if hash list is empty or contains one element
+        if (merkle.empty())
+            return bc::null_hash;
+        else if (merkle.size() == 1)
+            return merkle[0];
+        // While there is more than 1 hash in the list, keep looping...
+        while (merkle.size() > 1)
+        {
+            // If number of hashes is odd, duplicate last hash in the list.
+            if (merkle.size() % 2 != 0)
+                merkle.push_back(merkle.back());
+            // List size is now even.
+            assert(merkle.size() % 2 == 0);
+            // New hash list.
+            bc::hash_list new_merkle;
+            // Loop through hashes 2 at a time.
+            for (auto it = merkle.begin(); it != merkle.end(); it += 2)
+            {
+                // Join both current hashes together (concatenate).
+                bc::data_chunk concat_data(bc::hash_size * 2);
+                auto concat = bc::serializer<
+                        decltype(concat_data.begin())>(concat_data.begin());
+                concat.write_hash(*it);
+                concat.write_hash(*(it + 1));
+                // Hash both of the hashes.
+                bc::hash_digest new_root = bc::bitcoin_hash(concat_data);
+                // Add this to the new list.
+                new_merkle.push_back(new_root);
+            }
+            // This is the new list.
+            merkle = new_merkle;
+            // DEBUG output -------------------------------------
+//            std::cout << "Current merkle hash list:" << std::endl;
+//            for (const auto& hash: merkle)
+//                std::cout << " " << bc::encode_base16(hash) << std::endl;
+//            std::cout << std::endl;
+            // --------------------------------------------------
+        }
+        // Finally we end up with a single item.
+        return merkle[0];
+    }
+
     std::string getMerkleRoot(const VTransactions& transactions) {
         if (transactions.empty()) return VHasher::getHash("");
         VTransactions transSorted(transactions);
@@ -126,7 +172,7 @@ namespace VCoin
     void validateTransactions(VTransactions& transactions) {
         for (int i = 0; i < transactions.size(); ++i) {
             if (transactions[i].id != VHasher::getHash(transactions[i].toHex())) {
-                std::cout << "Invalid transaction found!\n";
+                std::cout << "Invalid transaction found!\nProvided hash:\t" + transactions[i].id + "\nShould be:\t" + VHasher::getHash(transactions[i].toHex()) + "\n\n";
                 transactions.erase(transactions.begin() + i);
             }
         }
@@ -139,19 +185,19 @@ namespace VCoin
         }
     }
 
+    bool hashMeetsTarget(std::string hash, char target) {
+        for (char i = 0; i < target; ++i) {
+            if (hash[(int)i] != '0') return false;
+        }
+        return true;
+    }
+
     class BlockChain
     {
     private:
         std::map<std::string, VBlock> blockChain;
         std::string chainHead;
         size_t _size;
-
-        bool hashMeetsTarget(std::string hash, char target) {
-            for (char i = 0; i < target; ++i) {
-                if (hash[(int)i] != '0') return false;
-            }
-            return true;
-        }
 
     public:
         BlockChain(VBlock genesis) {
@@ -189,16 +235,20 @@ namespace VCoin
     class Miner
     {
     public:
-        static bool hashMeetsTarget(std::string hash, char target) {
-            for (char i = 0; i < target; ++i) {
-                if (hash[(int)i] != '0') return false;
-            }
-            return true;
-        }
-
         static void mine(VBlock& block, BlockChain* chain = nullptr, uint64_t seed = 0) {
             block.nonce = seed;
-            block.merkleRootHash = getMerkleRoot(block.transactions);
+
+            bc::hash_list tx_hashes;
+            for (auto it = block.transactions.begin(); it != block.transactions.end(); ++it) {
+                std::array<unsigned char, 32> hash;
+                std::string tx_hash = VHasher::getHash(it->toHex());
+                for (int i = 0; i < 32; ++i) {
+                    hash[i] = tx_hash[i];
+                }
+                tx_hashes.push_back(hash);
+            }
+            block.merkleRootHash = bc::encode_base16(create_merkle(tx_hashes));
+
             if (chain != nullptr) block.prevBlock = chain->head();
             else block.prevBlock = VHasher::getHash("");
             block.diffTarget = kCurrentDifficulty;
@@ -245,8 +295,6 @@ namespace VCoin { namespace IO
                 std::stringstream sstream(line);
                 VTransaction transaction;
                 sstream >> transaction.id >> transaction.receiver >> transaction.sender >> transaction.sum >> transaction.timestamp;
-                // Check if hash is valid here
-                transaction.id = VHasher::getHash(transaction.toHex());
                 transactions.push_back(transaction);
             } in.close();
 
