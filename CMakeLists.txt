@@ -10,6 +10,3 @@ if(OpenMP_CXX_FOUND)
 endif()
 
 set(CMAKE_CXX_FLAGS "-O3")
-
-
-
